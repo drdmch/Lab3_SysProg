@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AST</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+body { font-family: monospace; }
+line { stroke: #999; }
+circle { fill: white; stroke: steelblue; stroke-width: 2px; }
+text { font-size: 12px; }
+</style>
+</head>
+<body>
+<h3>AST: programs/fibonacci.cpp</h3>
+<svg></svg>
+<script>
+var data = {"name": "program", "children": [{"name": "func int fib", "children": [{"name": "params", "children": [{"name": "param int n", "children": []}]}, {"name": "block", "children": [{"name": "if", "children": [{"name": "binop <", "children": [{"name": "var n", "children": []}, {"name": "num 2", "children": []}]}, {"name": "return", "children": [{"name": "var n", "children": []}]}]}, {"name": "return", "children": [{"name": "binop +", "children": [{"name": "call fib", "children": [{"name": "binop -", "children": [{"name": "var n", "children": []}, {"name": "num 1", "children": []}]}]}, {"name": "call fib", "children": [{"name": "binop -", "children": [{"name": "var n", "children": []}, {"name": "num 2", "children": []}]}]}]}]}]}]}, {"name": "func int main", "children": [{"name": "params", "children": []}, {"name": "block", "children": [{"name": "for", "children": [{"name": "decl int i", "children": [{"name": "num 0", "children": []}]}, {"name": "binop <", "children": [{"name": "var i", "children": []}, {"name": "num 10", "children": []}]}, {"name": "++ i", "children": []}, {"name": "block", "children": [{"name": "cout", "children": [{"name": "call fib", "children": [{"name": "var i", "children": []}]}, {"name": "\" \"", "children": []}]}]}]}, {"name": "cout", "children": [{"name": "endl", "children": []}]}, {"name": "return", "children": [{"name": "num 0", "children": []}]}]}]}]};
+
+var root = d3.hierarchy(data);
+var height = root.leaves().length * 30;
+var width = root.height * 150;
+d3.tree().size([height, width])(root);
+
+var svg = d3.select('svg').attr('width', width + 200).attr('height', height + 40);
+var g = svg.append('g').attr('transform', 'translate(50, 20)');
+
+g.selectAll('line').data(root.links()).enter().append('line')
+  .attr('x1', function(d) { return d.source.y; })
+  .attr('y1', function(d) { return d.source.x; })
+  .attr('x2', function(d) { return d.target.y; })
+  .attr('y2', function(d) { return d.target.x; });
+
+g.selectAll('circle').data(root.descendants()).enter().append('circle')
+  .attr('cx', function(d) { return d.y; })
+  .attr('cy', function(d) { return d.x; })
+  .attr('r', 5);
+
+g.selectAll('text').data(root.descendants()).enter().append('text')
+  .attr('x', function(d) { return d.y; })
+  .attr('y', function(d) { return d.x - 8; })
+  .attr('text-anchor', 'middle')
+  .text(function(d) { return d.data.name; });
+</script>
+</body>
+</html>
